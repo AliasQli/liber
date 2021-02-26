@@ -1,0 +1,53 @@
+name:                liber
+version:             1.0.0.0
+github:              "Alias Qli/liber"
+license:             BSD3
+author:              "Alias Qli"
+maintainer:          "2576814881@qq.com"
+copyright:           "2021 Alias Qli"
+
+extra-source-files:
+- script.scr
+- c/*
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/Alias Qli/liber#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- parsec
+- containers
+- file-embed
+- text
+
+library:
+  source-dirs: src
+
+executables:
+  reader-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - c/terminal.c
+    dependencies:
+    - liber
+
+tests:
+  reader-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - liber
