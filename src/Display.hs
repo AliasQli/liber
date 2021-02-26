@@ -2,13 +2,11 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
 
-module Main where
+module Display where
 
 import Control.Concurrent
 import Control.Monad
-import Data.FileEmbed
 import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Maybe
@@ -81,12 +79,10 @@ process chapters mvar vars (Age commands : sentences) = do
       process chapters mvar vars' $
         fromMaybe (error $ "No Caput " <> title <> " found!") $ lookup title chapters
 
-scriptFile = decodeUtf8 $(embedFile "script.scr")
-
-main = do
+display utf8Script = do
   hSetBuffering stdout NoBuffering
   disableEcho
-  let Script vars chapters = either (error . show) id $ parseScript scriptFile
+  let Script vars chapters = either (error . show) id $ parseScript (decodeUtf8 utf8Script)
   let sentences = fromMaybe (error "No Caput Primum found!") $ lookup "Primum" chapters
   mvar <- newEmptyMVar
   forkIO $

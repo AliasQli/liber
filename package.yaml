@@ -8,7 +8,7 @@ copyright:           "2021 Alias Qli"
 
 extra-source-files:
 - script.scr
-- c/*
+- src/c/*
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -25,24 +25,36 @@ dependencies:
 - containers
 - file-embed
 - text
+- filepath
+- bytestring
 
 library:
   source-dirs: src
 
 executables:
-  reader-exe:
+  liber-embedded:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         embedded
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - c/terminal.c
+     - src/c/terminal.c
+    dependencies:
+    - liber
+  liber-standalone:
+    main:                Main.hs
+    source-dirs:         standalone
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+     - src/c/terminal.c
     dependencies:
     - liber
 
 tests:
-  reader-test:
+  liber-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
