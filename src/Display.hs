@@ -17,6 +17,9 @@ import Parser.Type
 import System.IO
 import Terminal
 import Text.Read (readMaybe)
+import qualified Data.ByteString as B
+import Language.Haskell.TH
+import Parser.ToTemplate
 
 ms = 1000
 
@@ -94,3 +97,8 @@ display (Script vars chapters) = do
       putMVar mvar line
   putChar '\n'
   process chapters mvar vars sentences
+
+embedScript path = do
+  file <- runIO $ B.readFile path
+  let script = getScript file
+  toTemplate script

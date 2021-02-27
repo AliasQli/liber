@@ -1,9 +1,12 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Parser.Type where
 
 import Data.Map (Map)
 import qualified Data.Map as M
+import GHC.Generics
+import Parser.ToTemplate as Export
 
 type Status = Map String Int
 
@@ -12,12 +15,14 @@ data St = St
   , actors :: [(String, String)]
   , vars :: Status
   }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
 
-initState = St 0 [] M.empty
+instance ToTemplate St
 
 data Script = Script Status [Chapter]
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+
+instance ToTemplate Script
 
 type Chapter = (String, [Sentence])
 
@@ -26,12 +31,16 @@ data Sentence
   | Electio String [String]
   | Si Boolean Sentence
   | Age [Command]
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+
+instance ToTemplate Sentence
 
 data Expr
   = Var String
   | Lit Int
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+
+instance ToTemplate Expr
 
 data Boolean
   = Est Expr Expr
@@ -40,7 +49,28 @@ data Boolean
   | Et Boolean Boolean
   | Aut Boolean Boolean
   | Non Boolean
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+
+instance ToTemplate Boolean
+
+data Command
+  = I String
+  | Aug String Expr
+  | Min String Expr
+  | Mul String Expr
+  | Div String Expr
+  | Ads String Expr
+  deriving (Show, Eq, Generic)
+
+instance ToTemplate Command
+
+initState = St 0 [] M.empty
+
+predTable = [("Est", Est), ("Plus", Plus), ("Infra", Infra)]
+
+op2Table = [("Et", Et), ("Aut", Aut)]
+
+commandTable = [("Aug", Aug), ("Min", Min), ("Mul", Mul), ("Div", Div), ("Ads", Ads)]
 
 data Symbol
   = Pred (Expr -> Expr -> Boolean)
@@ -53,18 +83,3 @@ instance Show Symbol where
   show (Op1 _) = "Op1"
   show (Op2 _) = "Op2"
   show (Expr e) = show e
-
-data Command
-  = I String
-  | Aug String Expr
-  | Min String Expr
-  | Mul String Expr
-  | Div String Expr
-  | Ads String Expr
-  deriving (Show, Eq)
-
-predTable = [("Est", Est), ("Plus", Plus), ("Infra", Infra)]
-
-op2Table = [("Et", Et), ("Aut", Aut)]
-
-commandTable = [("Aug", Aug), ("Min", Min), ("Mul", Mul), ("Div", Div), ("Ads", Ads)]

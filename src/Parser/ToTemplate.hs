@@ -1,19 +1,62 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 
-module Parser.ToTemplate where
+module Parser.ToTemplate(ToTemplate, toTemplate) where
 
+import qualified Data.ByteString as B
 import Data.Map (Map)
 import qualified Data.Map as M
 import GHC.Generics
 import Language.Haskell.TH
-import Parser.Type
-import qualified Data.ByteString as B
-import Display
 
 class ToTemplate a where
   toTemplate :: a -> Q Exp
+  default toTemplate :: (Generic a, GToTemplate (Rep a)) => a -> Q Exp
+  toTemplate a = unExpX $ gtoTemplate (from a)
+
+data ExpX
+  = Con
+      { unExpX :: ExpQ
+      }
+  | Fields
+      { fields :: [ExpQ]
+      }
+
+class GToTemplate f where
+  gtoTemplate :: f a -> ExpX
+
+instance GToTemplate V1 where
+  gtoTemplate _ = error "Type without any data constructor may not be an instance of ToTemplate."
+
+instance GToTemplate U1 where
+  gtoTemplate _ = Fields []
+
+instance ToTemplate c => GToTemplate (K1 R c) where
+  gtoTemplate (K1 x) = Fields [toTemplate x]
+
+instance (GToTemplate a, GToTemplate b) => GToTemplate (a :+: b) where
+  gtoTemplate (L1 x) = gtoTemplate x
+  gtoTemplate (R1 x) = gtoTemplate x
+
+instance (GToTemplate a, GToTemplate b) => GToTemplate (a :*: b) where
+  gtoTemplate (a :*: b) = Fields $ fields (gtoTemplate a) ++ fields (gtoTemplate b)
+
+instance (GToTemplate f, Constructor c) => GToTemplate (M1 C c f) where
+  gtoTemplate (M1 (x :: f a)) = Con $ foldl appE cons xs
+    where
+      nm = mkName $ conName (undefined :: M1 C c f p)
+      cons = conE nm
+      xs = fields $ gtoTemplate x
+
+instance {-# OVERLAPPABLE #-} (GToTemplate f) => GToTemplate (M1 i c f) where
+  gtoTemplate (M1 x) = gtoTemplate x
 
 instance ToTemplate String where
   toTemplate s = litE (stringL s)
@@ -33,40 +76,3 @@ instance (ToTemplate a, ToTemplate b) => ToTemplate (a, b) where
 
 instance (ToTemplate k, ToTemplate a) => ToTemplate (Map k a) where
   toTemplate map = varE 'M.fromList `appE` toTemplate (M.toList map)
-
-instance ToTemplate Expr where
-  toTemplate (Var s) = conE 'Var `appE` toTemplate s
-  toTemplate (Lit i) = conE 'Lit `appE` toTemplate i
-
-instance ToTemplate Command where
-  toTemplate (I s) = conE 'I `appE` toTemplate s
-  toTemplate (Aug s e) = conE 'Aug `appE` toTemplate s `appE` toTemplate e
-  toTemplate (Min s e) = conE 'Min `appE` toTemplate s `appE` toTemplate e
-  toTemplate (Mul s e) = conE 'Mul `appE` toTemplate s `appE` toTemplate e
-  toTemplate (Div s e) = conE 'Div `appE` toTemplate s `appE` toTemplate e
-  toTemplate (Ads s e) = conE 'Ads `appE` toTemplate s `appE` toTemplate e
-
-instance ToTemplate Boolean where
-  toTemplate (Est e1 e2) = conE 'Est `appE` toTemplate e1 `appE` toTemplate e2
-  toTemplate (Plus e1 e2) = conE 'Plus `appE` toTemplate e1 `appE` toTemplate e2
-  toTemplate (Infra e1 e2) = conE 'Infra `appE` toTemplate e1 `appE` toTemplate e2
-  toTemplate (Et b1 b2) = conE 'Et `appE` toTemplate b1 `appE` toTemplate b2
-  toTemplate (Aut b1 b2) = conE 'Aut `appE` toTemplate b1 `appE` toTemplate b2
-  toTemplate (Non b) = conE 'Non `appE` toTemplate b
-
-instance ToTemplate Sentence where
-  toTemplate (Speak may ss) = conE 'Speak `appE` toTemplate may `appE` toTemplate ss
-  toTemplate (Electio s ss) = conE 'Electio `appE` toTemplate s `appE` toTemplate ss
-  toTemplate (Si b sen) = conE 'Si `appE` toTemplate b `appE` toTemplate sen
-  toTemplate (Age commands) = conE 'Age `appE` toTemplate commands
-
-instance ToTemplate St where
-  toTemplate (St indent actors vars) = conE 'St `appE` toTemplate indent `appE` toTemplate actors `appE` toTemplate vars
-
-instance ToTemplate Script where
-  toTemplate (Script status chapters) = conE 'Script `appE` toTemplate status `appE` toTemplate chapters
-  
-embedScript path = do
-  file <- runIO $ B.readFile path
-  let script = getScript file
-  toTemplate script

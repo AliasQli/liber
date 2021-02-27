@@ -3,7 +3,7 @@
 module Main where
 
 import Display
-import Parser.ToTemplate
+import Parser.Type
 
 script = $(embedScript "script.scr")
 
