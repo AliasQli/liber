@@ -20,4 +20,5 @@ main = do
             else return path
         | otherwise -> error "Invalid argument."
   utf8Script <- B.readFile filepath
-  display utf8Script
+  let script = getScript utf8Script
+  display script

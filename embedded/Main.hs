@@ -2,9 +2,9 @@
 
 module Main where
 
-import Data.FileEmbed
 import Display
+import Parser.ToTemplate
 
-utf8Script = $(embedFile "script.scr")
+script = $(embedScript "script.scr")
 
-main = display utf8Script
+main = display script

@@ -11,7 +11,9 @@ import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Maybe
 import Data.Text.Encoding
-import Parse
+import Parser.Eval
+import Parser.Parse
+import Parser.Type
 import System.IO
 import Terminal
 import Text.Read (readMaybe)
@@ -79,10 +81,11 @@ process chapters mvar vars (Age commands : sentences) = do
       process chapters mvar vars' $
         fromMaybe (error $ "No Caput " <> title <> " found!") $ lookup title chapters
 
-display utf8Script = do
+getScript utf8Script = either (error . show) id $ parseScript (decodeUtf8 utf8Script)
+
+display (Script vars chapters) = do
   hSetBuffering stdout NoBuffering
   disableEcho
-  let Script vars chapters = either (error . show) id $ parseScript (decodeUtf8 utf8Script)
   let sentences = fromMaybe (error "No Caput Primum found!") $ lookup "Primum" chapters
   mvar <- newEmptyMVar
   forkIO $
