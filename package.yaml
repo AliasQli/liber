@@ -44,7 +44,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    # - src/c/terminal.c
+    - src/c/terminal.c
     dependencies:
     - liber
   liber-standalone:
@@ -54,7 +54,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    # - src/c/terminal.c
+    - src/c/terminal.c
     dependencies:
     - liber
 
@@ -65,6 +65,6 @@ tests:
     ghc-options:
     - -threaded
     - -rtsopts
-    # -with-rtsopts=-N
+    - -with-rtsopts=-N
     dependencies:
     - liber
