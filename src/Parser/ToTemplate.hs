@@ -8,11 +8,13 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Parser.ToTemplate(ToTemplate, toTemplate) where
+module Parser.ToTemplate (ToTemplate, toTemplate) where
 
 import qualified Data.ByteString as B
 import Data.Map (Map)
 import qualified Data.Map as M
+import Data.Vector (Vector)
+import qualified Data.Vector as V
 import GHC.Generics
 import Language.Haskell.TH
 
@@ -76,3 +78,6 @@ instance (ToTemplate a, ToTemplate b) => ToTemplate (a, b) where
 
 instance (ToTemplate k, ToTemplate a) => ToTemplate (Map k a) where
   toTemplate map = varE 'M.fromList `appE` toTemplate (M.toList map)
+
+instance ToTemplate a => ToTemplate (Vector a) where
+  toTemplate vec = varE 'V.fromList `appE` toTemplate (V.toList vec)

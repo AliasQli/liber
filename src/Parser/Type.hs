@@ -7,6 +7,7 @@ import Data.Map (Map)
 import qualified Data.Map as M
 import GHC.Generics
 import Parser.ToTemplate as Export
+import Data.Vector (Vector)
 
 type Status = Map String Int
 
@@ -19,12 +20,12 @@ data St = St
 
 instance ToTemplate St
 
-data Script = Script Status [Chapter]
+data Script = Script Status (Vector Chapter)
   deriving (Show, Eq, Generic)
 
 instance ToTemplate Script
 
-type Chapter = (String, [Sentence])
+type Chapter = (String, Vector Sentence)
 
 data Sentence
   = Speak (Maybe String) [String]

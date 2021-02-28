@@ -16,6 +16,8 @@ import Data.Functor.Identity (Identity)
 import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Maybe
+import Data.Vector (Vector)
+import qualified Data.Vector as V
 import Parser.Helper
 import Parser.Type
 import Text.Parsec
@@ -160,13 +162,13 @@ si = do
   optional whiteLine
   return $ Si c a
 
-caput :: Parse (String, [Sentence])
+caput :: Parse (String, Vector Sentence)
 caput = do
   string "Caput"
   whites1
   nm <- name
   oneOrTwoLine
-  (nm,) <$> many (try electio <|> try age <|> try si <|> try speak <|> narrate)
+  (nm,) . V.fromList <$> many (try electio <|> try age <|> try si <|> try speak <|> narrate)
 
 script :: Parse Script
 script = do
@@ -178,7 +180,7 @@ script = do
   spaces
   eof
   St{..} <- getState
-  return $ Script vars chapters
+  return $ Script vars (V.fromList chapters)
 
 parseScriptFile fname = runParser script initState fname <$> readFile fname
 

@@ -5,6 +5,7 @@ module Main where
 
 import qualified Data.ByteString as B
 import Display
+import Path
 import System.Environment
 import System.FilePath
 
@@ -13,10 +14,10 @@ main = do
   filepath <-
     if
         | null args ->
-          flip replaceFileName "script.scr" <$> getExecutablePath
+          concatRelativePath "script.scr"
         | path : _ <- args ->
           if isRelative path
-            then flip replaceFileName path <$> getExecutablePath
+            then concatRelativePath path
             else return path
         | otherwise -> error "Invalid argument."
   utf8Script <- B.readFile filepath

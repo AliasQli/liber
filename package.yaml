@@ -30,6 +30,8 @@ dependencies:
 - word8
 - recursion-schemes
 - template-haskell
+- mtl
+- vector
 
 library:
   source-dirs: src
@@ -42,7 +44,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - src/c/terminal.c
+    # - src/c/terminal.c
     dependencies:
     - liber
   liber-standalone:
@@ -52,7 +54,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - src/c/terminal.c
+    # - src/c/terminal.c
     dependencies:
     - liber
 
