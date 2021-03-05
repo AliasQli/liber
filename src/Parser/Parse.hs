@@ -2,6 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
@@ -16,6 +17,7 @@ import Data.Functor.Identity (Identity)
 import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Maybe
+import Data.String (IsString)
 import Data.Vector (Vector)
 import qualified Data.Vector as V
 import Parser.Helper
@@ -184,5 +186,5 @@ script = do
 
 parseScriptFile fname = runParser script initState fname <$> readFile fname
 
-parseScript :: Stream s Identity Char => s -> Either ParseError Script
-parseScript = runParser script initState ""
+parseScript :: (Stream s Identity Char, Semigroup s, IsString s) => s -> Either ParseError Script
+parseScript = runParser script initState "" . (<> "\n")

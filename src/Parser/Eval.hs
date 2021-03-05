@@ -24,7 +24,7 @@ eval map = cata go
     go (EstF e1 e2) = fetch' e1 == fetch' e2
     go (PlusF e1 e2) = fetch' e1 > fetch' e2
     go (InfraF e1 e2) = fetch' e1 < fetch' e2
-    go (EtF b1 b2) = b1 == b2
+    go (EtF b1 b2) = b1 && b2
     go (AutF b1 b2) = b1 || b2
     go (NonF b) = not b
 

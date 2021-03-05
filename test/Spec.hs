@@ -1,4 +1,3 @@
-import Parse
 
 main :: IO ()
-main = putStrLn "No test suite implemented yet."
+main = putStrLn "Test suite not implemented yet."
