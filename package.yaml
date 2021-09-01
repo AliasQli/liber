@@ -1,14 +1,14 @@
-name:                liber
-version:             1.0.0.0
-github:              "Alias Qli/liber"
-license:             BSD3
-author:              "Alias Qli"
-maintainer:          "2576814881@qq.com"
-copyright:           "2021 Alias Qli"
+name: liber
+version: 1.0.1
+github: "AliasQli/liber"
+license: BSD3
+author: "Alias Qli"
+maintainer: "2576814881@qq.com"
+copyright: "2021 Alias Qli"
 
 extra-source-files:
-- script.scr
-- src/c/*
+  - script.scr
+  - src/c/*
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -17,53 +17,117 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/Alias Qli/liber#readme>
+description: Please see the README on GitHub at <https://github.com/AliasQli/liber#readme>
 
 dependencies:
-- base >= 4.7 && < 5
-- parsec
-- containers
-- text
-- filepath
-- bytestring
-- word8
-- recursion-schemes
-- template-haskell
-- mtl
-- vector
+  - base >= 4.7 && < 5
+  - parsec
+  - containers
+  - text
+  - filepath
+  - bytestring
+  - word8
+  - recursion-schemes
+  - template-haskell
+  - mtl
+  - vector
+  - megaparsec
+  - hspec-megaparsec
+  - raw-strings-qq
+  - binary
+  - lens
+  - time
+  - directory
+  # - encoding
+
+ghc-options:
+  - -j
+  - -O
+  - -Wall
+  - -Wcompat
+  - -Wincomplete-record-updates
+  # - -Wredundant-constraints
+  - -Wno-orphans
+  - -Wno-name-shadowing
+
+default-extensions:
+  - ApplicativeDo
+  - ConstraintKinds
+  - DataKinds
+  - DefaultSignatures
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - EmptyCase
+  - ExistentialQuantification
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - InstanceSigs
+  - KindSignatures
+  - LambdaCase
+  - MultiParamTypeClasses
+  - MultiWayIf
+  - NamedFieldPuns
+  - OverloadedStrings
+  - PatternSynonyms
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TupleSections
+  - TypeApplications
+  - TypeFamilies
+  - TypeFamilyDependencies
+  - TypeOperators
 
 library:
   source-dirs: src
 
 executables:
-  liber-embedded:
-    main:                Main.hs
-    source-dirs:         embedded
+  # liber-embedded:
+  #   main:                Main.hs
+  #   source-dirs:         embedded
+  #   ghc-options:
+  #   - -threaded
+  #   - -rtsopts
+  #   - -with-rtsopts=-N
+  #   - src/c/terminal.c
+  #   dependencies:
+  #   - liber
+  main:
+    main: Main.hs
+    source-dirs: main
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    - src/c/terminal.c
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - src/c/terminal.c
     dependencies:
-    - liber
-  liber-standalone:
-    main:                Main.hs
-    source-dirs:         standalone
+      - liber
+  encoder:
+    main: Main.hs
+    source-dirs: encoder
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    - src/c/terminal.c
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - liber
+      - liber
+  
 
 tests:
   liber-test:
-    main:                Spec.hs
-    source-dirs:         test
+    main: Spec.hs
+    source-dirs: test
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - liber
+      - liber
